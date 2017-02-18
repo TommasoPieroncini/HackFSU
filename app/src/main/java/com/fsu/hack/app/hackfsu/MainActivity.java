@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,12 +40,17 @@ public class MainActivity extends AppCompatActivity {
     private Button verifyButton;
     private Button recognizeButton;
     private MicrosoftApiService service;
+    private byte[] bytes;
+    private String identificationId;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         filePath = getExternalCacheDir().getAbsolutePath() + "/" + filename;
+        gson = new Gson();
 
         verifyButton = (Button) findViewById(R.id.verifyButton);
         enrollButton = (Button) findViewById(R.id.enrollButton);
@@ -75,32 +82,34 @@ public class MainActivity extends AppCompatActivity {
         enrollButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file = new File(getExternalCacheDir().getAbsolutePath(), filename);
-                int size = (int) file.length();
-                byte[] bytes = new byte[size];
-                try {
-                    BufferedInputStream bf = new BufferedInputStream(new FileInputStream(file));
-                    bf.read(bytes, 0, bytes.length);
-                    bf.close();
-                } catch (Exception e) {
-                    Log.e("TEST", "Error: " + e.toString());
+
+                if (identificationId == null) {
+                    // Get Identification number
+                    //.
+                    //.
+                    //.
+                    // Request Body
+                    HashMap<String, String> kv = new HashMap<>();
+                    kv.put("locale", "en-us");
+
+                    // Initialize Call
+                    Call<ResponseBody> id_call = service.getIdNumber(kv);
+
+                    // Get Response Body
+                    JSONObject response = null;
+                    try {
+                        String r = (new NetworkCall().execute(id_call).get()).string();
+                        response = new JSONObject(r);
+                        identificationId = response.get("identificationProfileId").toString();
+                    } catch (Exception e) {
+                        Log.e("TEST", "Failed to execute request: " + e.toString());
+                    }
+
+                    Toast.makeText(getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
+                } else {
+                    // Send Audio for enrollment
+
                 }
-
-                // Request Body
-                HashMap<String, String> kv = new HashMap<>();
-                kv.put("locale", "en-us");
-
-                // Initialize Call
-                Call<ResponseBody> id_call = service.getIdNumber(kv);
-
-                // Get Response Body
-                String response = "";
-                try {
-                    response = (new NetworkCall().execute(id_call).get()).string();
-                } catch (Exception e) {
-                    Log.e("TEST", "Failed to execute request: " + e.toString());
-                }
-                Toast.makeText(getBaseContext(), response, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -116,6 +125,21 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Result not-ok", Toast.LENGTH_SHORT).show();
                 // Oops! User has canceled the recording
             }
+        }
+    }
+
+    private void retrieveAudioFile() {
+
+        // Populates the bytes array
+        File file = new File(getExternalCacheDir().getAbsolutePath(), filename);
+        int size = (int) file.length();
+        bytes = new byte[size];
+        try {
+            BufferedInputStream bf = new BufferedInputStream(new FileInputStream(file));
+            bf.read(bytes, 0, bytes.length);
+            bf.close();
+        } catch (Exception e) {
+            Log.e("TEST", "Error: " + e.toString());
         }
     }
 }
