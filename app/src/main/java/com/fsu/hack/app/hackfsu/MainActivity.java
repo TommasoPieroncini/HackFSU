@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Button enrollButton;
     private Button verifyButton;
     private Button recognizeButton;
+    private MicrosoftApiService service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
         enrollButton = (Button) findViewById(R.id.enrollButton);
         recognizeButton = (Button) findViewById(R.id.recognizeButton);
         recordButton = (Button) findViewById(R.id.recordButton);
+
+        // Initialize Service
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://westus.api.cognitive.microsoft.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        service = retrofit.create(MicrosoftApiService.class);
 
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,15 +86,14 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("TEST", "Error: " + e.toString());
                 }
 
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("https://westus.api.cognitive.microsoft.com/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-
-                MicrosoftApiService service = retrofit.create(MicrosoftApiService.class);
+                // Request Body
                 HashMap<String, String> kv = new HashMap<>();
                 kv.put("locale", "en-us");
+
+                // Initialize Call
                 Call<ResponseBody> id_call = service.getIdNumber(kv);
+
+                // Get Response Body
                 String response = "";
                 try {
                     response = (new NetworkCall().execute(id_call).get()).string();
