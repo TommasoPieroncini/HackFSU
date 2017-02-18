@@ -1,44 +1,52 @@
 package com.fsu.hack.app.hackfsu;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 import cafe.adriel.androidaudiorecorder.AndroidAudioRecorder;
 import cafe.adriel.androidaudiorecorder.model.AudioChannel;
 import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-    String filePath;
-    int color ;
-    int requestCode = 0;
-    Button recordButton;
+
+    private String filename = "recorded_audio.wav";
+    private String filePath;
+    private int color ;
+    private int requestCode = 0;
+    private Button recordButton;
+    private Button enrollButton;
+    private Button verifyButton;
+    private Button recognizeButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        filePath = getExternalCacheDir().getAbsolutePath() + "/recorded_audio.wav";
-        Toast.makeText(getBaseContext(), filePath, Toast.LENGTH_LONG).show();
+        filePath = getExternalCacheDir().getAbsolutePath() + "/" + filename;
 
-
+        verifyButton = (Button) findViewById(R.id.verifyButton);
+        enrollButton = (Button) findViewById(R.id.enrollButton);
+        recognizeButton = (Button) findViewById(R.id.recognizeButton);
         recordButton = (Button) findViewById(R.id.recordButton);
 
         recordButton.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +63,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        enrollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File file = new File(getExternalCacheDir().getAbsolutePath(), filename);
+                int size = (int) file.length();
+                byte[] bytes = new byte[size];
+                try {
+                    BufferedInputStream bf = new BufferedInputStream(new FileInputStream(file));
+                    bf.read(bytes, 0, bytes.length);
+                    bf.close();
+                } catch (Exception e) {
+                    Log.e("TEST", "Error: " + e.toString());
+                }
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("https://westus.api.cognitive.microsoft.com/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                MicrosoftApiService service = retrofit.create(MicrosoftApiService.class);
+                HashMap<String, String> kv = new HashMap<>();
+                kv.put("locale", "en-us");
+                Call<ResponseBody> id_call = service.getIdNumber(kv);
+                String response = "";
+                try {
+                    response = (new NetworkCall().execute(id_call).get()).string();
+                } catch (Exception e) {
+                    Log.e("TEST", "Failed to execute request: " + e.toString());
+                }
+                Toast.makeText(getBaseContext(), response, Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
     @Override

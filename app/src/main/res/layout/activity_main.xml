@@ -10,11 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.fsu.hack.app.hackfsu.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
-
     <Button
         android:text="Record"
         android:layout_width="wrap_content"
@@ -22,4 +17,32 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/recordButton" />
+
+    <Button
+        android:text="Enroll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/enrollButton"
+        android:layout_below="@+id/recordButton"
+        android:layout_alignLeft="@+id/recordButton"
+        android:layout_alignStart="@+id/recordButton" />
+
+    <Button
+        android:text="Verify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/verifyButton"
+        android:layout_below="@+id/enrollButton"
+        android:layout_alignLeft="@+id/enrollButton"
+        android:layout_alignStart="@+id/enrollButton" />
+
+    <Button
+        android:text="Recognize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/verifyButton"
+        android:layout_alignLeft="@+id/verifyButton"
+        android:layout_alignStart="@+id/verifyButton"
+        android:id="@+id/recognizeButton" />
+
 </RelativeLayout>
