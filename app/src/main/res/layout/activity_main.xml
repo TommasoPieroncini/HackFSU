@@ -18,40 +18,68 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/recordButton" />
 
-    <Button
-        android:text="Get New ID"
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/enrollButton"
-        android:layout_below="@+id/recordButton"
-        android:layout_alignLeft="@+id/recordButton"
-        android:layout_alignStart="@+id/recordButton" />
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/editName"
+        android:hint="Name" />
+
+    <Button
+        android:text="Read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/readButton"
+        android:layout_above="@+id/recordButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Recognize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/recognizeButton"
+        android:layout_above="@+id/recordButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/resetButton"
+        android:layout_below="@+id/readButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:text="Verify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/verifyButton"
-        android:layout_below="@+id/enrollButton"
-        android:layout_alignLeft="@+id/enrollButton"
-        android:layout_alignStart="@+id/enrollButton" />
-
-    <Button
-        android:text="Recognize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/verifyButton"
-        android:layout_alignLeft="@+id/verifyButton"
-        android:layout_alignStart="@+id/verifyButton"
-        android:id="@+id/recognizeButton" />
-
-    <Button
-        android:text="Reset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_below="@+id/recognizeButton"
-        android:layout_alignRight="@+id/recognizeButton"
-        android:layout_alignEnd="@+id/recognizeButton"
-        android:id="@+id/resetButton" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Get New ID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/enrollButton"
+        android:layout_above="@+id/recognizeButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="get Op Status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/getOpStatusButton"
+        android:layout_above="@+id/readButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
