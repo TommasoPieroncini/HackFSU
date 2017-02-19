@@ -8,22 +8,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
-import org.json.JSONArray;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 
 import cafe.adriel.androidaudiorecorder.AndroidAudioRecorder;
 import cafe.adriel.androidaudiorecorder.model.AudioChannel;
 import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -39,10 +32,11 @@ public class MainActivity extends AppCompatActivity {
     private Button enrollButton;
     private Button verifyButton;
     private Button recognizeButton;
+    private Button reset;
     private MicrosoftApiService service;
-    private byte[] bytes;
     private String identificationId;
-    private Gson gson;
+    private boolean audioRecorded = false;
+    private byte[] bytes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +44,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         filePath = getExternalCacheDir().getAbsolutePath() + "/" + filename;
-        gson = new Gson();
 
         verifyButton = (Button) findViewById(R.id.verifyButton);
         enrollButton = (Button) findViewById(R.id.enrollButton);
         recognizeButton = (Button) findViewById(R.id.recognizeButton);
         recordButton = (Button) findViewById(R.id.recordButton);
+        reset = (Button) findViewById(R.id.resetButton);
 
         // Initialize Service
         Retrofit retrofit = new Retrofit.Builder()
@@ -64,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         service = retrofit.create(MicrosoftApiService.class);
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                identificationId = null;
+                enrollButton.setText("Get New ID");
+            }
+        });
 
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                         .setChannel(AudioChannel.MONO)
                         .setSampleRate(AudioSampleRate.HZ_16000)
                         .record();
+                audioRecorded = true;
             }
         });
 
@@ -106,9 +109,36 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
+                    if (identificationId != null) {
+                        enrollButton.setText("Enroll");
+                    }
                 } else {
-                    // Send Audio for enrollment
+                    if (!audioRecorded) {
+                        Toast.makeText(getBaseContext(), "Record an audio first!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Send Audio for enrollment
+                        //.
+                        //.
+                        //.
+                        // Retrieve Audio
+                        try {
+                            bytes = FileUtils.readFileToByteArray(new File(getExternalCacheDir().getAbsolutePath(), filename));
+                        } catch (Exception e) {
+                            Log.e("TEST", "Failed reading file: " + e.toString());
+                        }
 
+                        Call<ResponseBody> id_call = service.enroll(identificationId, true, bytes);
+                        JSONObject response = null;
+                        try {
+                            String r = (new NetworkCall().execute(id_call).get()).string();
+                            Toast.makeText(getBaseContext(), r, Toast.LENGTH_LONG).show();
+                            response = new JSONObject(r);
+                        } catch (Exception e) {
+                            Log.e("TEST", "Failed to execute request: " + e.toString());
+                        }
+                        Toast.makeText(getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
+                        audioRecorded = false;
+                    }
                 }
             }
         });
@@ -125,21 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Result not-ok", Toast.LENGTH_SHORT).show();
                 // Oops! User has canceled the recording
             }
-        }
-    }
-
-    private void retrieveAudioFile() {
-
-        // Populates the bytes array
-        File file = new File(getExternalCacheDir().getAbsolutePath(), filename);
-        int size = (int) file.length();
-        bytes = new byte[size];
-        try {
-            BufferedInputStream bf = new BufferedInputStream(new FileInputStream(file));
-            bf.read(bytes, 0, bytes.length);
-            bf.close();
-        } catch (Exception e) {
-            Log.e("TEST", "Error: " + e.toString());
         }
     }
 }

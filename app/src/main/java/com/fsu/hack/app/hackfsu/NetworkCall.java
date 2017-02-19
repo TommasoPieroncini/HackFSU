@@ -16,7 +16,11 @@ public class NetworkCall extends AsyncTask<Call<ResponseBody>, Void, ResponseBod
     protected ResponseBody doInBackground(Call<ResponseBody>... params) {
         try {
             Response<ResponseBody> response = params[0].execute();
-            return response.body();
+            if (response.errorBody() != null) {
+                return response.errorBody();
+            } else {
+                return response.body();
+            }
         } catch (Exception e) {
             Log.e("TEST", "Failed network call: " + e.toString());
         }

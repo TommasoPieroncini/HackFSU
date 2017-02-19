@@ -42,4 +42,5 @@ dependencies {
     compile 'com.github.adrielcafe:AndroidAudioRecorder:0.2.0'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'commons-io:commons-io:2.4'
 }

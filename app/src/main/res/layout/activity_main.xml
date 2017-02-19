@@ -19,7 +19,7 @@
         android:id="@+id/recordButton" />
 
     <Button
-        android:text="Enroll"
+        android:text="Get New ID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/enrollButton"
@@ -44,5 +44,14 @@
         android:layout_alignLeft="@+id/verifyButton"
         android:layout_alignStart="@+id/verifyButton"
         android:id="@+id/recognizeButton" />
+
+    <Button
+        android:text="Reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/recognizeButton"
+        android:layout_alignRight="@+id/recognizeButton"
+        android:layout_alignEnd="@+id/recognizeButton"
+        android:id="@+id/resetButton" />
 
 </RelativeLayout>
